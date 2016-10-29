@@ -1,0 +1,41 @@
+BEGIN TRANSACTION;
+
+/* Create a table called NAMES */
+CREATE TABLE Entity(EntityId integer PRIMARY KEY, EntityName text);
+CREATE TABLE Balances(EntityId integer, BalanceDate date, Balance float);
+CREATE TABLE Status(EntityId integer, StatusDate date, Status text);
+
+INSERT INTO Entity VALUES(1,'ABCD');
+INSERT INTO Entity VALUES(2,'XYZ');
+
+INSERT INTO Balances VALUES(1,'5/1/2010',100.00);
+INSERT INTO Balances VALUES(1,'4/1/2010',50.00);
+INSERT INTO Balances VALUES(1,'3/1/2010',75.00);
+INSERT INTO Balances VALUES(1,'2/1/2010',85.00);
+INSERT INTO Balances VALUES(2,'5/1/2010',110.00);
+
+INSERT INTO Status VALUES(1,'5/29/2010','A');
+INSERT INTO Status VALUES(1,'4/16/2010','B');
+INSERT INTO Status VALUES(1,'4/2/2010','C');
+INSERT INTO Status VALUES(1,'2/26/2010','D');
+INSERT INTO Status VALUES(2,'5/1/2010','B');
+COMMIT;
+
+/* Display all the records from the table */
+SELECT * FROM Entity;
+SELECT * FROM Balances;
+SELECT * FROM Status;
+
+/* Query 1 */
+select (select EntityName from Entity where EntityId= b.EntityId) as EntityName, BalanceDate as Date, b.Balance,s.Status from Balances b LEFT JOIN Status s 
+on b.EntityId= s.EntityId AND b.BalanceDate >= (select max(StatusDate) from status);
+
+/* Query 2 */
+Select e.EntityName, s.Status, AVG(b.balance) as 'Average Balance', max(b.BalanceDate) as 'As Of'
+FROM Entity e, Balances b, Status s
+Where e.EntityID = b.EntityId and
+b.EntityID = s.EntityID
+Group by e.EntityName
+
+
+
